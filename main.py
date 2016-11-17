@@ -1,5 +1,8 @@
 import json
 import smtplib
+import urllib.request
+
+SKURT_API_URL = 'http://skurt-interview-api.herokuapp.com/carStatus/'
 
 class sendEmail:
     def __init__(self, email, password, recipient):
@@ -35,9 +38,22 @@ def main():
     with open('emailAlert.json') as emailAlert_file:
         emailAlert = json.load(emailAlert_file)
 
-    emailSender = sendEmail(credentials['username'], credentials['password'], emailAlert['recipient'])
-    emailSender.send(emailAlert['subject'], emailAlert['body'])
+    #emailSender = sendEmail(credentials['username'], credentials['password'], emailAlert['recipient'])
+    #emailSender.send(emailAlert['subject'], emailAlert['body'])
 
+    try:
+        f = urllib.request.urlopen(SKURT_API_URL + '5')
+        text = f.read().decode('utf-8')
+        #print(text)
+        print(type(text))
+
+        obj = json.loads(text)
+        print(type(obj))
+        print(obj)
+
+
+    except Exception as e:
+            print(e)
 
 if __name__ == "__main__":
     main()
