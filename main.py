@@ -1,6 +1,11 @@
 import json
 import smtplib
 import urllib.request
+#import sched, time
+import time
+#import threading
+from threading import Timer
+
 from shapely.geometry import shape, Point, mapping
 
 SKURT_API_URL = 'http://skurt-interview-api.herokuapp.com/carStatus/'
@@ -29,6 +34,19 @@ class sendEmail:
         except Exception as e:
             print(e)
 
+# def do_something(s, emailSender, emailAlert): 
+#     #print("Doing stuff...")
+#     print('EVENT:', time.time())
+
+#     #emailSender.send(emailAlert['subject'], emailAlert['body'])
+
+#     # do your stuff
+#     s.enter(5, 1, do_something, (s, emailSender, emailAlert,))
+
+def printit(emailSender, emailAlert):
+    Timer(5.0, printit, (emailSender, emailAlert)).start()
+    print('EVENT:', time.time())
+
 
 def main():
     print("Hello World")
@@ -39,32 +57,38 @@ def main():
     with open('emailAlert.json') as emailAlert_file:
         emailAlert = json.load(emailAlert_file)
 
-    #emailSender = sendEmail(credentials['username'], credentials['password'], emailAlert['recipient'])
-    #emailSender.send(emailAlert['subject'], emailAlert['body'])
+    emailSender = sendEmail(credentials['username'], credentials['password'], emailAlert['recipient'])
+    emailSender.send(emailAlert['subject'], emailAlert['body'])
 
-    try:
-        f = urllib.request.urlopen(SKURT_API_URL + '10')
-        text = f.read().decode('utf-8')
-        #print(text)
-        #print(type(text))
+    # s = sched.scheduler(time.time, time.sleep)
+    # s.enter(5, 1, do_something, (s, emailSender, emailAlert,))
+    # s.run()
 
-        obj = json.loads(text)
-        #print(type(obj))
-        #print(obj)
-        #print(obj['features'][1]['geometry'])
+    #printit(emailSender, emailAlert)
 
-        boundary = shape(obj['features'][1]['geometry'])
-        #print(json.dumps(mapping(boundary)))
-        carLoc = Point(obj['features'][0]['geometry']['coordinates'][0], obj['features'][0]['geometry']['coordinates'][1])
+    # try:
+    #     f = urllib.request.urlopen(SKURT_API_URL + '10')
+    #     text = f.read().decode('utf-8')
+    #     #print(text)
+    #     #print(type(text))
 
-        # Returns True if the boundary and interior of the object intersect in any way with those of the other.
-        if boundary.intersects(carLoc):
-            print('Car within boundary')
-        else:
-            print('Car out of boundary')
+    #     obj = json.loads(text)
+    #     #print(type(obj))
+    #     #print(obj)
+    #     #print(obj['features'][1]['geometry'])
 
-    except Exception as e:
-            print(e)
+    #     boundary = shape(obj['features'][1]['geometry'])
+    #     #print(json.dumps(mapping(boundary)))
+    #     carLoc = Point(obj['features'][0]['geometry']['coordinates'][0], obj['features'][0]['geometry']['coordinates'][1])
+
+    #     # Returns True if the boundary and interior of the object intersect in any way with those of the other.
+    #     if boundary.intersects(carLoc):
+    #         print('Car within boundary')
+    #     else:
+    #         print('Car out of boundary')
+
+    # except Exception as e:
+    #         print(e)
 
 if __name__ == "__main__":
     main()
