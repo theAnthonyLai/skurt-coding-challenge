@@ -1,9 +1,7 @@
 import json
 import smtplib
 import urllib.request
-#import sched, time
 import time
-#import threading
 from threading import Timer
 
 from shapely.geometry import shape, Point, mapping
@@ -34,18 +32,11 @@ class sendEmail:
         except Exception as e:
             print(e)
 
-# def do_something(s, emailSender, emailAlert): 
-#     #print("Doing stuff...")
-#     print('EVENT:', time.time())
 
-#     #emailSender.send(emailAlert['subject'], emailAlert['body'])
-
-#     # do your stuff
-#     s.enter(5, 1, do_something, (s, emailSender, emailAlert,))
-
-def printit(emailSender, emailAlert):
-    Timer(5.0, printit, (emailSender, emailAlert)).start()
+def emailThread(emailSender, emailAlert):
+    Timer(5.0, emailThread, (emailSender, emailAlert)).start()
     print('EVENT:', time.time())
+    emailSender.send(emailAlert['subject'], emailAlert['body'])
 
 
 def main():
@@ -58,13 +49,10 @@ def main():
         emailAlert = json.load(emailAlert_file)
 
     emailSender = sendEmail(credentials['username'], credentials['password'], emailAlert['recipient'])
-    emailSender.send(emailAlert['subject'], emailAlert['body'])
+    #emailSender.send(emailAlert['subject'], emailAlert['body'])
 
-    # s = sched.scheduler(time.time, time.sleep)
-    # s.enter(5, 1, do_something, (s, emailSender, emailAlert,))
-    # s.run()
 
-    #printit(emailSender, emailAlert)
+    emailThread(emailSender, emailAlert)
 
     # try:
     #     f = urllib.request.urlopen(SKURT_API_URL + '10')
