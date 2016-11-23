@@ -6,6 +6,8 @@ from threading import Timer
 from shapely.geometry import shape, Point, mapping
 from enum import Enum
 
+EMAIL_SERVER_URL = 'smtp.gmail.com'
+EMAIL_SERVER_PORT = 465
 SKURT_API_URL = 'http://skurt-interview-api.herokuapp.com/carStatus/'
 MAX_CAR_ID = 10
 MIN_CAR_ID = 1
@@ -35,7 +37,7 @@ class SendEmail:
 
         try:
             # need SMTP_SSL for port 465
-            server_ssl = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+            server_ssl = smtplib.SMTP_SSL(EMAIL_SERVER_URL, EMAIL_SERVER_PORT)
             # initiate SMTP conversation with SMTP server
             server_ssl.ehlo()
             # provide log-in info
