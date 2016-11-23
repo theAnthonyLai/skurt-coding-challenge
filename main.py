@@ -7,6 +7,8 @@ from threading import Timer
 from shapely.geometry import shape, Point, mapping
 
 SKURT_API_URL = 'http://skurt-interview-api.herokuapp.com/carStatus/'
+MAX_CAR_ID = 10
+MIN_CAR_ID = 1
 
 class sendEmail:
     def __init__(self, email, password, recipient):
@@ -33,10 +35,39 @@ class sendEmail:
             print(e)
 
 
-def emailThread(emailSender, emailFormat):
-    Timer(5.0, emailThread, (emailSender, emailFormat)).start()
+def checkCarStatus(carId, emailSender, emailFormat):
+    print('Checking car %d' % carId)
+    #testVar = SKURT_API_URL + str(carId)
+    #print(testVar)
+    try:
+        res = urllib.request.urlopen(SKURT_API_URL + str(carId))
+        text = res.read().decode('utf-8')
+        obj = json.loads(text)
+
+        boundary = shape(obj['features'][1]['geometry'])
+        carLoc = Point(obj['features'][0]['geometry']['coordinates'][0], obj['features'][0]['geometry']['coordinates'][1])
+
+        # Returns True if the boundary and interior of the object intersect in any way with those of the other.
+        if boundary.intersects(carLoc):
+            print('Car %d within boundary' % carId)
+        else:
+            print('Car %d out of boundary' % carId)
+
+    except Exception as e:
+            print(e)
+
+
+def checkCarThread(carId, emailSender, emailFormat):
+    # check current car
+    checkCarStatus(carId, emailSender, emailFormat)
+
+    carId += 1
+    if carId > MAX_CAR_ID:
+        carId = MIN_CAR_ID
+
+    Timer(5.0, checkCarThread, (carId, emailSender, emailFormat)).start()
     print('EVENT:', time.time())
-    emailSender.send(emailFormat['subject'], emailFormat['body'])
+    #emailSender.send(emailFormat['subject'], emailFormat['body'])
 
 
 def main():
@@ -52,7 +83,7 @@ def main():
     #emailSender.send(emailFormat['subject'], emailFormat['body'])
 
 
-    emailThread(emailSender, emailFormat)
+    checkCarThread(MIN_CAR_ID, emailSender, emailFormat)
 
     # try:
     #     f = urllib.request.urlopen(SKURT_API_URL + '10')
