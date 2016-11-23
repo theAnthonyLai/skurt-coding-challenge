@@ -43,7 +43,7 @@ class SendEmail:
             server_ssl.sendmail(self.email, self.recipient, msg)
             server_ssl.close()
             if type == EmailType.test:
-                print('Test email has been sent out successfully!')
+                print('Test email has been sent out successfully! Begin checking each car.')
             elif type == EmailType.alert:
                 print('Alert email for car %d sent successfully!' % carId)
             else:
@@ -52,7 +52,7 @@ class SendEmail:
             print(e)
 
 
-def checkCarStatus(carId, emailSender, emailFormat):
+def checkCarStatus(carId, emailSender):
     print('Checking car %d' % carId)
 
     try:
@@ -68,27 +68,28 @@ def checkCarStatus(carId, emailSender, emailFormat):
             print('Car %d within boundary' % carId)
         else:
             print('Car %d out of boundary. Sending alert email.' % carId)
-            emailSender.send(emailFormat['subject'], emailFormat['body'], carId)
+            emailSender.send(EmailType.alert, carId)
 
     except Exception as e:
             print('Err getting car status:', e)
+            emailSender.send(EmailType.error, carId)
 
 
-def checkCarThread(carId, emailSender, emailFormat):
+def checkCarThread(carId, emailSender):
     # check current car
     print('================================')
     print('EVENT:', datetime.datetime.now())
-    checkCarStatus(carId, emailSender, emailFormat)
+    checkCarStatus(carId, emailSender)
 
     carId += 1
     if carId > MAX_CAR_ID:
         carId = MIN_CAR_ID
 
-    Timer(MONITOR_INTERVAL, checkCarThread, (carId, emailSender, emailFormat)).start()
+    Timer(MONITOR_INTERVAL, checkCarThread, (carId, emailSender)).start()
 
 
 def main():
-    print("Hello World")
+    print("Setting up login credentials.")
 
     # load json credentials and alert email format
     with open('credentials.json') as credentials_file:
@@ -97,14 +98,12 @@ def main():
         emailFormat = json.load(emailFormat_file)
 
     emailSender = SendEmail(credentials['username'], credentials['password'], emailFormat['recipient'], emailFormat['format'])
-    #emailSender.send(emailFormat['subject'], emailFormat['body'])
 
-    #emailSender.send(emailFormat['test'])
-    #emailSender.send(emailFormat['error'], 9)
+    print("Sending one test email to verify everything is working.")
+    emailSender.send(EmailType.test)
 
-    emailSender.send(EmailType.error, 5)
-
-    #checkCarThread(MIN_CAR_ID, emailSender, emailFormat)
+    # fire up checkCarThread to repeatedly checking each car
+    checkCarThread(MIN_CAR_ID, emailSender)
 
 if __name__ == "__main__":
     main()
