@@ -33,10 +33,10 @@ class sendEmail:
             print(e)
 
 
-def emailThread(emailSender, emailAlert):
-    Timer(5.0, emailThread, (emailSender, emailAlert)).start()
+def emailThread(emailSender, emailFormat):
+    Timer(5.0, emailThread, (emailSender, emailFormat)).start()
     print('EVENT:', time.time())
-    emailSender.send(emailAlert['subject'], emailAlert['body'])
+    emailSender.send(emailFormat['subject'], emailFormat['body'])
 
 
 def main():
@@ -45,14 +45,14 @@ def main():
     # load json credentials and alert email format
     with open('credentials.json') as credentials_file:
         credentials = json.load(credentials_file)
-    with open('emailAlert.json') as emailAlert_file:
-        emailAlert = json.load(emailAlert_file)
+    with open('emailFormat.json') as emailFormat_file:
+        emailFormat = json.load(emailFormat_file)
 
-    emailSender = sendEmail(credentials['username'], credentials['password'], emailAlert['recipient'])
-    #emailSender.send(emailAlert['subject'], emailAlert['body'])
+    emailSender = sendEmail(credentials['username'], credentials['password'], emailFormat['recipient'])
+    #emailSender.send(emailFormat['subject'], emailFormat['body'])
 
 
-    emailThread(emailSender, emailAlert)
+    emailThread(emailSender, emailFormat)
 
     # try:
     #     f = urllib.request.urlopen(SKURT_API_URL + '10')
