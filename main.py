@@ -4,21 +4,34 @@ import urllib.request
 import datetime
 from threading import Timer
 from shapely.geometry import shape, Point, mapping
+from enum import Enum
 
 SKURT_API_URL = 'http://skurt-interview-api.herokuapp.com/carStatus/'
 MAX_CAR_ID = 10
 MIN_CAR_ID = 1
 MONITOR_INTERVAL = 5 # (seconds) TODO
 
-class sendEmail:
-    def __init__(self, email, password, recipient):
+class EmailType(Enum):
+    test = 1
+    alert = 2
+    error = 3
+
+class SendEmail:
+    def __init__(self, email, password, recipient, format):
         self.email = email
         self.password = password
         self.recipient = recipient
+        self.format = format
 
-    def send(self, subject, body, carId):
-        msg = """From: %s\nTo: %s\nSubject: %s\n\n%s
-        """ % (self.email, self.recipient, subject, body)
+    def send(self, type, carId = -1):
+        if type == EmailType.test:
+            # for default test email, no carId
+            msg = """From: %s\nTo: %s\nSubject: %s\n\n%s
+            """ % (self.email, self.recipient, self.format[type.name]['subject'], self.format[type.name]['body'])
+        else:
+            # add carId to email subject line
+            msg = """From: %s\nTo: %s\nSubject: %s\n\n%s
+            """ % (self.email, self.recipient, self.format[type.name]['subject'] % carId, self.format[type.name]['body'])
 
         try:
             # need SMTP_SSL for port 465
@@ -29,7 +42,12 @@ class sendEmail:
             server_ssl.login(self.email, self.password)
             server_ssl.sendmail(self.email, self.recipient, msg)
             server_ssl.close()
-            print('Alert email for car %d sent successfully!' % carId)
+            if type == EmailType.test:
+                print('Test email has been sent out successfully!')
+            elif type == EmailType.alert:
+                print('Alert email for car %d sent successfully!' % carId)
+            else:
+                print('Error email for car %d sent successfully!' % carId)
         except Exception as e:
             print(e)
 
@@ -78,11 +96,15 @@ def main():
     with open('emailFormat.json') as emailFormat_file:
         emailFormat = json.load(emailFormat_file)
 
-    emailSender = sendEmail(credentials['username'], credentials['password'], emailFormat['recipient'])
+    emailSender = SendEmail(credentials['username'], credentials['password'], emailFormat['recipient'], emailFormat['format'])
     #emailSender.send(emailFormat['subject'], emailFormat['body'])
 
+    #emailSender.send(emailFormat['test'])
+    #emailSender.send(emailFormat['error'], 9)
 
-    checkCarThread(MIN_CAR_ID, emailSender, emailFormat)
+    emailSender.send(EmailType.error, 5)
+
+    #checkCarThread(MIN_CAR_ID, emailSender, emailFormat)
 
 if __name__ == "__main__":
     main()

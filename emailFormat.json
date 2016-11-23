@@ -1,5 +1,17 @@
 {
     "recipient": "yukuan.anthony.lai@gmail.com",
-    "subject": "this is a test subject",
-    "body": "body"
+    "format": {
+        "test": {
+            "subject": "[TEST] - Car Status Alert Email",
+            "body": "This is a test email. Email credentials have been setup successfully."
+        },
+        "alert": {
+            "subject": "[ALERT] - Car %d Out of Bound",
+            "body": "Car %d Out of Bound."
+        },
+        "error": {
+            "subject": "[ERROR] - Car %d Status Request",
+            "body": "Error when making API call to get car status update."
+        }
+    }
 }
