@@ -9,7 +9,7 @@ from enum import Enum
 SKURT_API_URL = 'http://skurt-interview-api.herokuapp.com/carStatus/'
 MAX_CAR_ID = 10
 MIN_CAR_ID = 1
-MONITOR_INTERVAL = 5 # (seconds) TODO
+MONITOR_INTERVAL = 25 # seconds (300 seconds / 10 cars; give some extra time in case email server is slow)
 
 class EmailType(Enum):
     test = 1
@@ -99,7 +99,7 @@ def main():
 
     emailSender = SendEmail(credentials['username'], credentials['password'], emailFormat['recipient'], emailFormat['format'])
 
-    print("Sending one test email to verify everything is working.")
+    print("Sending one test email to verify the receipt of alert email.")
     emailSender.send(EmailType.test)
 
     # fire up checkCarThread to repeatedly checking each car
