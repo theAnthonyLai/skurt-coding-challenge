@@ -7,7 +7,7 @@
         },
         "alert": {
             "subject": "[ALERT] - Car %d Out of Bound",
-            "body": "Car %d Out of Bound."
+            "body": "Car Out of Bound."
         },
         "error": {
             "subject": "[ERROR] - Car %d Status Request",
