@@ -13,6 +13,9 @@ pip install shapely
 #### Credentials
 A `credentials.json` file is needed to run the script. Please edit the username and password for the sender's account. If a non-gmail account is used, the `EMAIL_SERVER_URL` variable in `main.py` (line 9) will have to be changed.
 
+#### Gmail Login
+It is possible that Gmail will identify the script as a "less secure app". To enable sign in attempt from the script, visit [account setting](https://www.google.com/settings/security/lesssecureapps) to turn on access for less secure apps.
+
 #### Email Format
 The email formats are defined in `emailFormat.json`
 * `test` is for a test email that the script will send out in the beginning to verify the credentials and that the alert system is working
